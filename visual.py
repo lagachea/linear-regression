@@ -23,7 +23,7 @@ def display(theta_0, theta_1, km, price, km_min, km_max):
     plt.xlabel('km')
     plt.ylabel('price')
     plt.legend()
-    plt.savefig(f'./img/img_final.png', transparent = False)
+    plt.savefig(f'./img/img_-1.png', transparent = False)
     plt.show()
 
 def save_fig(t0, t1, df, iteration):

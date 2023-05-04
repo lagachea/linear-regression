@@ -19,14 +19,10 @@ n_prices = df["normalized_price"]
 df["normalized_km"] = get_normalized_list(kms.tolist(), km_min, km_max)
 n_kms = df["normalized_km"]
 
-n_km_min = n_kms.min()
-n_km_max = n_kms.max()
-
 sample_size = len(kms.values.tolist())
 
 theta_0, theta_1 = import_thetas()
 
-# Denormalize thetas
 def denormalize_thetas(t0, t1):
 
     # Some value for kms
@@ -52,36 +48,37 @@ def denormalize_thetas(t0, t1):
 
 frames = []
 
-# Perform linear reg a certain number (range)
-for i in range(0, 100):
-
-    learning_rate = 0.7
-    dt0 = 0
-    dt1 = 0
-
-    for km, price in zip(n_kms, n_prices):
-        price_diff = estimate_price(km, theta_0, theta_1) - price
-        dt0 += price_diff
-        dt1 += price_diff * km
-
-    theta_0 -= learning_rate * dt0 / sample_size
-    theta_1 -= learning_rate * dt1 / sample_size
-
-    dtheta0, dtheta1 = denormalize_thetas(theta_0, theta_1)
-    save_thetas(dtheta0, dtheta1)
-    save_fig(dtheta0, dtheta1, df, i)
-
+def gif_step(i):
     image = imageio.v2.imread(f'./img/img_{i}.png')
     frames.append(image)
+    if i == -1:
+        imageio.mimsave('./example.gif', frames, duration = 50)
 
+def gradient_descent(tehta0, theta1, xs, ys):
+    for i in range(0, 100):
 
+        learning_rate = 0.7
+        dt0 = 0
+        dt1 = 0
 
-# display(theta_0, theta_1, n_kms, n_prices, n_km_min, n_km_max)
+        for x, y in zip(xs, ys):
+            price_diff = estimate_price(x, tehta0, theta1) - y
+            dt0 += price_diff
+            dt1 += price_diff * x
 
+        tehta0 -= learning_rate * dt0 / sample_size
+        theta1 -= learning_rate * dt1 / sample_size
+
+        dtheta0, dtheta1 = denormalize_thetas(tehta0, theta1)
+        save_thetas(dtheta0, dtheta1)
+
+        save_fig(dtheta0, dtheta1, df, i)
+        gif_step(i)
+
+    return tehta0, theta1
+
+theta_0, theta_1 = gradient_descent(theta_0, theta_1, n_kms, n_prices)
 nt0, nt1 = denormalize_thetas(theta_0, theta_1)
 
 display(nt0, nt1, kms, prices, km_min, km_max)
-
-image = imageio.v2.imread(f'./img/img_final.png')
-frames.append(image)
-imageio.mimsave('./example.gif', frames, duration = 50)
+gif_step(-1)
