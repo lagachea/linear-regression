@@ -54,28 +54,27 @@ def gif_step(i):
     if i == -1:
         imageio.mimsave('./example.gif', frames, duration = 50)
 
-def gradient_descent(tehta0, theta1, xs, ys):
+def gradient_descent(theta0, theta1, xs, ys):
+    learning_rate = 0.7
     for i in range(0, 100):
-
-        learning_rate = 0.7
         dt0 = 0
         dt1 = 0
 
         for x, y in zip(xs, ys):
-            price_diff = estimate_price(x, tehta0, theta1) - y
+            price_diff = estimate_price(x, theta0, theta1) - y
             dt0 += price_diff
             dt1 += price_diff * x
 
-        tehta0 -= learning_rate * dt0 / sample_size
+        theta0 -= learning_rate * dt0 / sample_size
         theta1 -= learning_rate * dt1 / sample_size
 
-        dtheta0, dtheta1 = denormalize_thetas(tehta0, theta1)
+        dtheta0, dtheta1 = denormalize_thetas(theta0, theta1)
         save_thetas(dtheta0, dtheta1)
 
         save_fig(dtheta0, dtheta1, df, i)
         gif_step(i)
 
-    return tehta0, theta1
+    return theta0, theta1
 
 theta_0, theta_1 = gradient_descent(theta_0, theta_1, n_kms, n_prices)
 nt0, nt1 = denormalize_thetas(theta_0, theta_1)
