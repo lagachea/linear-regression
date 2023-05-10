@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from visual import display, save_fig
-from tools import import_data, import_thetas, estimate_price, get_normalized_list, get_denormalized_value, save_thetas
+from tools import import_data, import_thetas, estimate_price, get_normalized_list, save_thetas
 import imageio
 
 # Data import
@@ -9,9 +9,11 @@ df, kms, prices = import_data()
 
 km_min = kms.min()
 km_max = kms.max()
+km_mean = kms.mean()
 
-price_max = prices.max()
 price_min = prices.min()
+price_max = prices.max()
+price_mean = prices.mean()
 
 df["normalized_price"] = get_normalized_list(prices.tolist(), price_min, price_max)
 n_prices = df["normalized_price"]
@@ -19,30 +21,23 @@ n_prices = df["normalized_price"]
 df["normalized_km"] = get_normalized_list(kms.tolist(), km_min, km_max)
 n_kms = df["normalized_km"]
 
-sample_size = len(kms.values.tolist())
+sample_size = kms.count()
 
 theta_0, theta_1 = import_thetas()
 
 def denormalize_thetas(t0, t1):
 
-    # Some value for kms
-    x0, x1 = kms.values[0], kms.values[1]
+    x_range = km_max - km_min
+    y_range = price_max - price_min
 
-    # Price at x0
-    y0 = prices.values[0]
+    x_mean = km_mean
+    y_mean = price_mean
 
-    # Corresponding normalized value for kms
-    x0n, x1n = n_kms.values[0], n_kms.values[1]
+    range_ratio = y_range / x_range
 
-    # Corresponding normalized value for price using the normalized parameters
-    y0n, y1n = estimate_price(x0n, t0, t1), estimate_price(x1n, t0, t1)
-
-    # Denormalized value of estimation
-    y0r, y1r = get_denormalized_value(y0n, price_min, price_max), get_denormalized_value(y1n, price_min, price_max)
-
-    # Simplified equation from jon nimrod
-    dtheta_0 =  (y0r * x1 - x0 * y1r) / (x1 - x0)
-    dtheta_1 = (y0 - dtheta_0) / x0
+    # Geometrical approach
+    dtheta_1 = t1 * range_ratio
+    dtheta_0 = t0 * range_ratio + y_mean - dtheta_1 * x_mean
 
     return dtheta_0, dtheta_1
 
@@ -55,7 +50,7 @@ def gif_step(i):
         imageio.mimsave('./example.gif', frames, duration = 50)
 
 def gradient_descent(theta0, theta1, xs, ys):
-    learning_rate = 0.7
+    learning_rate = 1
     for i in range(0, 100):
         dt0 = 0
         dt1 = 0

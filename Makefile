@@ -4,8 +4,8 @@ install:
 	python3 -m pip install -r requirement.txt
 
 train:
-	rm -rf img && mkdir -p img && git restore theta.csv
-	./linear_regression.py
+	rm -rf img && mkdir -p img
+	git restore theta.csv && ./linear_regression.py
 
 predict:
 	./predict.py
