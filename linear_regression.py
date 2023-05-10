@@ -69,10 +69,9 @@ def gradient_descent(theta0, theta1, xs, ys):
         save_fig(dtheta0, dtheta1, df, i)
         gif_step(i)
 
-    return theta0, theta1
+    return denormalize_thetas(theta0, theta1)
 
-theta_0, theta_1 = gradient_descent(theta_0, theta_1, n_kms, n_prices)
-nt0, nt1 = denormalize_thetas(theta_0, theta_1)
+dt0, dt1 = gradient_descent(theta_0, theta_1, n_kms, n_prices)
 
-display(nt0, nt1, kms, prices, km_min, km_max)
+display(dt0, dt1, kms, prices, km_min, km_max)
 gif_step(-1)
