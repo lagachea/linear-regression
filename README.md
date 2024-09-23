@@ -1,5 +1,5 @@
 # linear_regression
-A simple program
+A linear regression on price and mileage from a simple dataset
 
 ## Installation and dependencies
 You need python, make
